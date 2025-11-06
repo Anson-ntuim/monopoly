@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大富翁遊戲 🎲</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #game-container {
+      display: none;
+      width: 95vw;
+      height: 95vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    #setup-screen {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 500px;
+    }
+
+    #setup-screen h1 {
+      color: #667eea;
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    #setup-screen .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+
+    .player-setup {
+      margin: 20px 0;
+    }
+
+    .player-input {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .player-input label {
+      width: 100px;
+      text-align: left;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .player-input input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+
+    .player-input input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .player-count {
+      margin: 20px 0;
+    }
+
+    .player-count label {
+      font-weight: bold;
+      margin-right: 10px;
+      color: #333;
+    }
+
+    .player-count select {
+      padding: 10px 20px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .start-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 50px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: bold;
+    }
+
+    .start-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .start-button:active {
+      transform: translateY(0);
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="setup-screen">
+      <h1>🎲 大富翁</h1>
+      <div class="subtitle">準備好成為房地產大亨了嗎？</div>
+
+      <div class="player-count">
+        <label for="player-count">玩家人數：</label>
+        <select id="player-count">
+          <option value="2">2人</option>
+          <option value="3">3人</option>
+          <option value="4">4人</option>
+        </select>
+      </div>
+
+      <div class="player-setup" id="player-setup">
+        <!-- Player inputs will be generated here -->
+      </div>
+
+      <button class="start-button" id="start-game">開始遊戲</button>
+    </div>
+
+    <div id="game-container">
+      <canvas id="game-canvas"></canvas>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
