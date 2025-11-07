@@ -31,6 +31,10 @@ export class UIManager {
   }
 
   render() {
+    // 重置骰子標記，確保新回合可以投骰子
+    if (this.game.state.dice[0] === 0) {
+      this.diceRolling = false
+    }
     this.renderer.render(this.game.state)
     this.updateRightPanel()
   }
@@ -107,6 +111,7 @@ export class UIManager {
       <div class="quick-actions">
         <button class="btn btn-secondary" id="manage-property-btn">🏠 管理地產</button>
         <button class="btn btn-secondary" id="stock-market-btn">📈 股市交易</button>
+        <button class="btn btn-secondary" id="show-rules-btn">📖 遊戲規則</button>
         <button class="btn btn-danger" id="end-turn-btn">⏭️ 結束回合</button>
       </div>
 
@@ -145,7 +150,11 @@ export class UIManager {
     // 投骰子按鈕
     const rollBtn = document.getElementById('roll-dice-btn')
     if (rollBtn) {
-      rollBtn.onclick = () => this.rollDiceWithAnimation()
+      rollBtn.onclick = async () => {
+        if (!this.diceRolling) {
+          await this.rollDiceWithAnimation()
+        }
+      }
     }
 
     // 購買/升級按鈕
@@ -176,6 +185,12 @@ export class UIManager {
     const stockBtn = document.getElementById('stock-market-btn')
     if (stockBtn) {
       stockBtn.onclick = () => this.showStockMarket()
+    }
+
+    // 遊戲規則
+    const rulesBtn = document.getElementById('show-rules-btn')
+    if (rulesBtn) {
+      rulesBtn.onclick = () => this.showRules()
     }
 
     // 結束回合
@@ -390,6 +405,91 @@ export class UIManager {
         this.render()
       }
     }
+  }
+
+  private showRules() {
+    const modal = document.createElement('div')
+    modal.className = 'modal-overlay'
+    modal.innerHTML = `
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h2>📖 遊戲規則說明</h2>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="rules-content">
+            <section class="rule-section">
+              <h3>🎯 遊戲目標</h3>
+              <p>透過購買地產、建設房屋、股票投資，累積財富成為最後存活的玩家！</p>
+            </section>
+
+            <section class="rule-section">
+              <h3>🎲 基本規則</h3>
+              <ul>
+                <li><strong>回合制</strong>：玩家輪流進行回合</li>
+                <li><strong>投擲骰子</strong>：每回合開始投擲 2 個骰子，依點數前進</li>
+                <li><strong>起點獎勵</strong>：每次經過或停在起點獲得 $2000</li>
+                <li><strong>初始資金</strong>：每位玩家起始擁有 $15000</li>
+              </ul>
+            </section>
+
+            <section class="rule-section">
+              <h3>🏠 地產系統</h3>
+              <ul>
+                <li><strong>購買地產</strong>：踩到無主地產可以購買</li>
+                <li><strong>支付租金</strong>：踩到他人地產需支付租金給地主</li>
+                <li><strong>建設房屋</strong>：擁有同色全組地產後可建造房屋（最多 4 棟）</li>
+                <li><strong>升級飯店</strong>：擁有 4 棟房屋後可升級為飯店</li>
+                <li><strong>租金倍增</strong>：房屋和飯店越多，租金越高</li>
+              </ul>
+            </section>
+
+            <section class="rule-section">
+              <h3>📈 股市交易</h3>
+              <ul>
+                <li><strong>買賣股票</strong>：在股市交易所可以買賣 5 種股票</li>
+                <li><strong>價格波動</strong>：每回合結束時股價會隨機波動</li>
+                <li><strong>投資策略</strong>：低買高賣以賺取差價</li>
+                <li><strong>持股查看</strong>：可隨時查看持有的股票數量</li>
+              </ul>
+            </section>
+
+            <section class="rule-section">
+              <h3>🎴 特殊格子</h3>
+              <ul>
+                <li><strong>機會 ❓</strong>：抽取機會卡，可能獲得獎勵或懲罰</li>
+                <li><strong>命運 📦</strong>：抽取命運卡，觸發隨機事件</li>
+                <li><strong>監獄 🚔</strong>：被關 3 回合或擲出雙倍骰才能出獄</li>
+                <li><strong>入獄 👮</strong>：直接送往監獄</li>
+                <li><strong>稅金 💰</strong>：需繳納固定金額的稅</li>
+                <li><strong>車站 🚂</strong>：擁有越多車站，租金越高</li>
+                <li><strong>公用事業 ⚡</strong>：租金依骰子點數計算</li>
+              </ul>
+            </section>
+
+            <section class="rule-section">
+              <h3>🏆 勝利條件</h3>
+              <ul>
+                <li>當只剩一位玩家未破產時，該玩家獲勝</li>
+                <li>破產條件：現金不足支付租金或其他費用</li>
+              </ul>
+            </section>
+
+            <section class="rule-section">
+              <h3>💡 遊戲技巧</h3>
+              <ul>
+                <li>優先購買同色地產組合，才能建造房屋</li>
+                <li>建造房屋可大幅提高租金收入</li>
+                <li>善用股市系統增加財富</li>
+                <li>保留足夠現金應對突發支出</li>
+                <li>策略性地選擇投資目標</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    `
+    document.body.appendChild(modal)
   }
 
   private showGameOver() {

@@ -737,6 +737,52 @@
       }
     }
 
+    /* 規則說明樣式 */
+    .rules-content {
+      color: #2d3748;
+      line-height: 1.8;
+    }
+
+    .rule-section {
+      margin-bottom: 30px;
+    }
+
+    .rule-section h3 {
+      color: #667eea;
+      font-size: 1.3em;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .rule-section p {
+      margin-bottom: 12px;
+      color: #4a5568;
+    }
+
+    .rule-section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .rule-section ul li {
+      padding: 8px 0 8px 24px;
+      position: relative;
+      color: #2d3748;
+    }
+
+    .rule-section ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .rule-section ul li strong {
+      color: #667eea;
+    }
+
     /* 滾動條美化 */
     ::-webkit-scrollbar {
       width: 8px;

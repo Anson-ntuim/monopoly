@@ -17,16 +17,29 @@ export class GameRenderer {
 
   private resizeCanvas() {
     const container = this.canvas.parentElement!
-    this.canvas.width = container.clientWidth
-    this.canvas.height = container.clientHeight
+    const dpr = window.devicePixelRatio || 1
+
+    // 設置實際大小（考慮 DPI）
+    this.canvas.width = container.clientWidth * dpr
+    this.canvas.height = container.clientHeight * dpr
+
+    // 設置顯示大小
+    this.canvas.style.width = container.clientWidth + 'px'
+    this.canvas.style.height = container.clientHeight + 'px'
+
+    // 縮放 context 以匹配 DPI
+    this.ctx.scale(dpr, dpr)
   }
 
   render(state: GameState) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    const dpr = window.devicePixelRatio || 1
+    this.ctx.clearRect(0, 0, this.canvas.width / dpr, this.canvas.height / dpr)
 
     // 棋盤置中顯示
-    const offsetX = (this.canvas.width - this.boardSize) / 2
-    const offsetY = (this.canvas.height - this.boardSize) / 2
+    const displayWidth = this.canvas.width / dpr
+    const displayHeight = this.canvas.height / dpr
+    const offsetX = (displayWidth - this.boardSize) / 2
+    const offsetY = (displayHeight - this.boardSize) / 2
 
     this.ctx.save()
     this.ctx.translate(offsetX, offsetY)
@@ -120,7 +133,7 @@ export class GameRenderer {
 
     // 名稱
     ctx.fillStyle = '#333'
-    ctx.font = 'bold 10px Arial'
+    ctx.font = 'bold 9px Arial'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
@@ -129,23 +142,36 @@ export class GameRenderer {
 
     // 旋轉文字以適應空間位置
     if (space.id >= 1 && space.id <= 9) {
-      // 底部
-      ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 25)
+      // 底部 - 正常顯示
+      ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 20)
+    } else if (space.id === 10) {
+      // 右下角 - 監獄
+      ctx.font = 'bold 8px Arial'
+      ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 10)
     } else if (space.id >= 11 && space.id <= 19) {
-      // 左侧
+      // 左側 - 逆時針旋轉 90 度
       ctx.translate(x + 15, y + this.spaceSize / 2)
       ctx.rotate(-Math.PI / 2)
       ctx.fillText(name, 0, 0)
+    } else if (space.id === 20) {
+      // 左上角 - 股市
+      ctx.font = 'bold 8px Arial'
+      ctx.fillText(name, x + this.spaceSize / 2, y + 15)
     } else if (space.id >= 21 && space.id <= 29) {
-      // 顶部
-      ctx.fillText(name, x + this.spaceSize / 2, y + 25)
+      // 頂部 - 正常顯示
+      ctx.fillText(name, x + this.spaceSize / 2, y + 20)
+    } else if (space.id === 30) {
+      // 右上角 - 入獄
+      ctx.font = 'bold 8px Arial'
+      ctx.fillText(name, x + this.spaceSize / 2, y + 15)
     } else if (space.id >= 31 && space.id <= 39) {
-      // 右侧
+      // 右側 - 順時針旋轉 90 度
       ctx.translate(x + this.spaceSize - 15, y + this.spaceSize / 2)
       ctx.rotate(Math.PI / 2)
       ctx.fillText(name, 0, 0)
-    } else {
-      // 角落
+    } else if (space.id === 0) {
+      // 右下角 - 起點
+      ctx.font = 'bold 10px Arial'
       ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize / 2)
     }
 
