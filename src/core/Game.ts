@@ -239,11 +239,8 @@ export class Game {
       return false
     }
 
-    // 檢查是否擁有整組地產
-    if (!this.hasMonopoly(player, property.color)) {
-      this.log(`必須擁有整組相同顏色的地產才能升級`)
-      return false
-    }
+    // 移除需要擁有整組地產的限制
+    // 玩家只要擁有這塊地產就可以建造
 
     if (player.money < property.houseCost) {
       this.log(`${player.name} 沒有足夠的錢升級 ${property.name}`)

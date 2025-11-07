@@ -386,10 +386,8 @@ export class UIManager {
         // 自己的地產
         if (space.type === SpaceType.PROPERTY) {
           const prop = space as Property
-          if (prop.houses < 5 && this.game.hasMonopoly(player, prop.color)) {
+          if (prop.houses < 5) {
             buttons += `<button class="btn btn-warning btn-large" data-action="upgrade" data-space="${space.id}">🏗️ 建造/升級 ($${prop.houseCost})</button>`
-          } else if (!this.game.hasMonopoly(player, prop.color)) {
-            buttons += '<div class="action-hint">💡 需要擁有同色全組地產才能建造</div>'
           } else if (prop.houses === 5) {
             buttons += '<div class="action-hint">✅ 已達最高等級（飯店）</div>'
           }
