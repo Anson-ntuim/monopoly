@@ -171,7 +171,9 @@ export class Game {
   buyProperty(player: Player, spaceId: number): boolean {
     const space = this.state.spaces[spaceId] as any
 
-    if (space.owner !== null || space.owner !== undefined) {
+    // 檢查地產是否已經有主人（null 和 undefined 都表示無主）
+    if (space.owner !== null && space.owner !== undefined) {
+      this.log(`${space.name} 已經有主人了`)
       return false
     }
 
@@ -252,9 +254,6 @@ export class Game {
   }
 
   endTurn() {
-    // 更新股市
-    this.stockMarket.updatePrices()
-
     // 下一個玩家
     do {
       this.state.currentPlayerIndex = (this.state.currentPlayerIndex + 1) % this.state.players.length
@@ -268,8 +267,11 @@ export class Game {
       this.log(`🎉 ${activePlayers[0].name} 贏得了遊戲！`)
     }
 
+    // 當所有玩家都完成回合（一輪結束）時，更新股價
     if (this.state.currentPlayerIndex === 0) {
       this.state.turn++
+      this.stockMarket.updatePrices()
+      this.log(`📈 股價已更新`)
     }
 
     this.notifyStateChange()

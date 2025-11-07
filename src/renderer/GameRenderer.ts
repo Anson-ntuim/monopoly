@@ -60,6 +60,9 @@ export class GameRenderer {
     // 繪製中央遊戲名稱
     this.drawCenterLogo()
 
+    // 繪製股價看板（左上角）
+    this.drawStockPrices(state)
+
     this.ctx.restore()
   }
 
@@ -364,6 +367,55 @@ export class GameRenderer {
     ctx.font = 'bold 32px Arial'
     ctx.fillStyle = '#4A5568'
     ctx.fillText('大富翁', centerX, centerY + 30)
+  }
+
+  private drawStockPrices(state: GameState) {
+    const ctx = this.ctx
+    const padding = 10
+    const startX = this.spaceSize + padding
+    const startY = this.spaceSize + padding
+    const lineHeight = 28
+    const boxWidth = 200
+    const boxHeight = 40 + (state.stocks.length * lineHeight)
+
+    // 半透明背景
+    ctx.fillStyle = 'rgba(26, 32, 44, 0.95)'
+    ctx.fillRect(startX, startY, boxWidth, boxHeight)
+    ctx.strokeStyle = '#667eea'
+    ctx.lineWidth = 2
+    ctx.strokeRect(startX, startY, boxWidth, boxHeight)
+
+    // 標題
+    ctx.fillStyle = '#667eea'
+    ctx.font = 'bold 14px Arial'
+    ctx.textAlign = 'left'
+    ctx.fillText('📈 即時股價', startX + 10, startY + 20)
+
+    // 股票列表
+    let yOffset = startY + 40
+    state.stocks.forEach(stock => {
+      // 股票名稱
+      ctx.fillStyle = '#E2E8F0'
+      ctx.font = 'bold 11px Arial'
+      ctx.fillText(`${stock.symbol}`, startX + 10, yOffset)
+
+      // 股價
+      ctx.font = '11px Arial'
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillText(`$${stock.price}`, startX + 70, yOffset)
+
+      // 漲跌
+      const changeColor = stock.change >= 0 ? '#48BB78' : '#F56565'
+      const changeSymbol = stock.change >= 0 ? '▲' : '▼'
+      const changeText = `${changeSymbol} ${Math.abs(stock.change).toFixed(1)}%`
+      ctx.fillStyle = changeColor
+      ctx.font = 'bold 10px Arial'
+      ctx.textAlign = 'right'
+      ctx.fillText(changeText, startX + boxWidth - 10, yOffset)
+      ctx.textAlign = 'left'
+
+      yOffset += lineHeight
+    })
   }
 
   // 繪製股市面板
