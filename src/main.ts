@@ -49,7 +49,7 @@ function startGame() {
   const gameContainer = document.getElementById('game-container')!
 
   setupScreen.style.display = 'none'
-  gameContainer.style.display = 'block'
+  gameContainer.style.display = 'flex'
 
   // 創建遊戲
   const canvas = document.getElementById('game-canvas') as HTMLCanvasElement

@@ -4,9 +4,9 @@ import { GameState, Player, Space, Property, Station, Utility, SpaceType } from 
 export class GameRenderer {
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
-  private spaceSize: number = 80
-  private boardSize: number = 880
-  private centerSize: number = 600
+  private spaceSize: number = 60  // 從 80 縮小到 60
+  private boardSize: number = 660  // 從 880 縮小到 660
+  private centerSize: number = 420
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -24,11 +24,19 @@ export class GameRenderer {
   render(state: GameState) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
+    // 棋盤置中顯示
     const offsetX = (this.canvas.width - this.boardSize) / 2
     const offsetY = (this.canvas.height - this.boardSize) / 2
 
     this.ctx.save()
     this.ctx.translate(offsetX, offsetY)
+
+    // 繪製棋盤背景
+    this.ctx.fillStyle = '#2D3748'
+    this.ctx.fillRect(-10, -10, this.boardSize + 20, this.boardSize + 20)
+    this.ctx.strokeStyle = '#4A5568'
+    this.ctx.lineWidth = 4
+    this.ctx.strokeRect(-10, -10, this.boardSize + 20, this.boardSize + 20)
 
     // 繪製棋盤
     this.drawBoard(state)
@@ -36,8 +44,8 @@ export class GameRenderer {
     // 繪製玩家
     this.drawPlayers(state)
 
-    // 繪製中央資訊面板
-    this.drawCenterPanel(state)
+    // 繪製中央遊戲名稱
+    this.drawCenterLogo()
 
     this.ctx.restore()
   }
@@ -283,87 +291,25 @@ export class GameRenderer {
     }
   }
 
-  private drawCenterPanel(state: GameState) {
+  private drawCenterLogo() {
     const ctx = this.ctx
     const centerX = this.boardSize / 2
     const centerY = this.boardSize / 2
-    const panelWidth = 500
-    const panelHeight = 500
 
-    // 面板背景
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
-    ctx.fillRect(centerX - panelWidth / 2, centerY - panelHeight / 2, panelWidth, panelHeight)
+    // 半透明背景
+    ctx.fillStyle = 'rgba(102, 126, 234, 0.1)'
+    ctx.fillRect(120, 120, this.boardSize - 240, this.boardSize - 240)
 
-    ctx.strokeStyle = '#667eea'
-    ctx.lineWidth = 4
-    ctx.strokeRect(centerX - panelWidth / 2, centerY - panelHeight / 2, panelWidth, panelHeight)
-
-    // 標題
+    // 遊戲標題
     ctx.fillStyle = '#667eea'
-    ctx.font = 'bold 24px Arial'
+    ctx.font = 'bold 48px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('🎲 大富翁', centerX, centerY - 220)
+    ctx.textBaseline = 'middle'
+    ctx.fillText('🎲', centerX, centerY - 30)
 
-    // 當前玩家資訊
-    const currentPlayer = state.players[state.currentPlayerIndex]
-    ctx.font = 'bold 18px Arial'
-    ctx.fillStyle = currentPlayer.color
-    ctx.fillText(`當前玩家: ${currentPlayer.name}`, centerX, centerY - 180)
-
-    // 玩家列表
-    let yOffset = centerY - 140
-    state.players.forEach((player, index) => {
-      if (player.bankrupted) return
-
-      ctx.fillStyle = player.color
-      ctx.fillRect(centerX - 220, yOffset - 10, 20, 20)
-
-      ctx.fillStyle = '#333'
-      ctx.font = '14px Arial'
-      ctx.textAlign = 'left'
-      ctx.fillText(`${player.name}: $${player.money}`, centerX - 190, yOffset + 5)
-
-      // 地產數量
-      ctx.font = '12px Arial'
-      ctx.fillStyle = '#666'
-      ctx.fillText(`地產: ${player.properties.length} | 位置: ${state.spaces[player.position].name}`, centerX - 190, yOffset + 22)
-
-      yOffset += 45
-    })
-
-    // 骰子顯示
-    if (state.dice[0] > 0) {
-      const diceY = centerY + 80
-      ctx.fillStyle = '#FFF'
-      ctx.strokeStyle = '#333'
-      ctx.lineWidth = 2
-
-      // 骰子1
-      ctx.fillRect(centerX - 60, diceY, 40, 40)
-      ctx.strokeRect(centerX - 60, diceY, 40, 40)
-      ctx.fillStyle = '#000'
-      ctx.font = 'bold 24px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText(state.dice[0].toString(), centerX - 40, diceY + 25)
-
-      // 骰子2
-      ctx.fillStyle = '#FFF'
-      ctx.fillRect(centerX + 20, diceY, 40, 40)
-      ctx.strokeRect(centerX + 20, diceY, 40, 40)
-      ctx.fillStyle = '#000'
-      ctx.fillText(state.dice[1].toString(), centerX + 40, diceY + 25)
-
-      // 總點數
-      ctx.fillStyle = '#667eea'
-      ctx.font = 'bold 16px Arial'
-      ctx.fillText(`總點數: ${state.dice[0] + state.dice[1]}`, centerX, diceY + 60)
-    }
-
-    // 回合數
-    ctx.fillStyle = '#999'
-    ctx.font = '12px Arial'
-    ctx.textAlign = 'center'
-    ctx.fillText(`回合: ${state.turn}`, centerX, centerY + 220)
+    ctx.font = 'bold 32px Arial'
+    ctx.fillStyle = '#4A5568'
+    ctx.fillText('大富翁', centerX, centerY + 30)
   }
 
   // 繪製股市面板

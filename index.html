@@ -12,79 +12,92 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', 'Microsoft JhengHei', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       overflow: hidden;
     }
 
     #app {
-      width: 100%;
+      width: 100vw;
       height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
 
-    #game-container {
-      display: none;
-      width: 95vw;
-      height: 95vh;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-    }
-
+    /* ===== 設置畫面 ===== */
     #setup-screen {
       background: white;
-      padding: 40px;
-      border-radius: 20px;
+      padding: 50px;
+      border-radius: 24px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       text-align: center;
       max-width: 500px;
+      animation: fadeIn 0.5s ease;
     }
 
     #setup-screen h1 {
       color: #667eea;
-      font-size: 3em;
-      margin-bottom: 20px;
+      font-size: 3.5em;
+      margin-bottom: 10px;
     }
 
     #setup-screen .subtitle {
       color: #666;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
+      font-size: 1.2em;
+    }
+
+    .player-count {
+      margin: 30px 0;
+    }
+
+    .player-count label {
+      font-weight: bold;
+      margin-right: 15px;
+      color: #333;
       font-size: 1.1em;
     }
 
+    .player-count select {
+      padding: 12px 24px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 1.1em;
+      cursor: pointer;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .player-count select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
     .player-setup {
-      margin: 20px 0;
+      margin: 30px 0;
     }
 
     .player-input {
-      margin: 15px 0;
+      margin: 20px 0;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
     }
 
     .player-input label {
       width: 100px;
       text-align: left;
       font-weight: bold;
-      color: #333;
+      font-size: 1.1em;
     }
 
     .player-input input {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 1em;
+      border-radius: 12px;
+      font-size: 1.1em;
       transition: border-color 0.3s;
     }
 
@@ -93,53 +106,659 @@
       border-color: #667eea;
     }
 
-    .player-count {
-      margin: 20px 0;
-    }
-
-    .player-count label {
-      font-weight: bold;
-      margin-right: 10px;
-      color: #333;
-    }
-
-    .player-count select {
-      padding: 10px 20px;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-
     .start-button {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 15px 50px;
-      font-size: 1.2em;
+      padding: 18px 60px;
+      font-size: 1.3em;
       border-radius: 50px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 30px;
       transition: transform 0.2s, box-shadow 0.2s;
       font-weight: bold;
     }
 
     .start-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
     }
 
     .start-button:active {
       transform: translateY(0);
     }
 
-    canvas {
+    /* ===== 遊戲畫面 ===== */
+    #game-container {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: row;
+      background: #1a202c;
+    }
+
+    #game-container.active {
+      display: flex;
+    }
+
+    /* 左側 - 棋盤 */
+    #board-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #1a202c;
+    }
+
+    #game-canvas {
       display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* 右側 - 控制面板 */
+    #right-panel {
+      width: 400px;
+      background: #f7fafc;
+      padding: 24px;
+      overflow-y: auto;
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 當前玩家卡片 */
+    .current-player-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .player-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .player-number {
+      color: white;
+    }
+
+    .player-info {
+      flex: 1;
+    }
+
+    .player-info h2 {
+      margin: 0 0 12px 0;
+      font-size: 1.4em;
+    }
+
+    .player-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75em;
+      color: #718096;
+    }
+
+    .stat-value {
+      font-weight: bold;
+      color: #2d3748;
+      font-size: 0.95em;
+    }
+
+    /* 骰子區域 */
+    .dice-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .dice-section h3 {
+      margin: 0 0 16px 0;
+      color: #2d3748;
+      font-size: 1.2em;
+    }
+
+    .dice-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .dice {
+      width: 70px;
+      height: 70px;
+      background: white;
+      border: 3px solid #667eea;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      transition: transform 0.2s;
+    }
+
+    .dice.rolling {
+      animation: diceRoll 0.1s infinite;
+    }
+
+    @keyframes diceRoll {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(10deg); }
+      75% { transform: rotate(-10deg); }
+    }
+
+    .dice-total {
+      font-size: 1.1em;
+      color: #667eea;
+      font-weight: bold;
+      margin: 12px 0;
+    }
+
+    .jail-notice {
+      color: #e53e3e;
+      font-weight: bold;
+      margin-top: 12px;
+      padding: 8px;
+      background: #fed7d7;
+      border-radius: 8px;
+    }
+
+    /* 按鈕樣式 */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #cbd5e0;
+      color: #2d3748;
+    }
+
+    .btn-large {
+      padding: 16px 32px;
+      font-size: 1.1em;
+      width: 100%;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85em;
+    }
+
+    /* 行動按鈕區域 */
+    .action-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .no-action {
+      color: #a0aec0;
+      text-align: center;
+      padding: 20px;
+      font-style: italic;
+    }
+
+    /* 玩家列表 */
+    .players-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .players-section h3 {
+      margin: 0 0 16px 0;
+      color: #2d3748;
+      font-size: 1.2em;
+    }
+
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f7fafc;
+      transition: all 0.2s;
+    }
+
+    .player-item.active {
+      background: #e6fffa;
+      border: 2px solid #38b2ac;
+    }
+
+    .player-item.bankrupted {
+      opacity: 0.5;
+      filter: grayscale(100%);
+    }
+
+    .player-color {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .player-details {
+      flex: 1;
+    }
+
+    .player-name {
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 4px;
+    }
+
+    .player-money {
+      font-size: 0.9em;
+      color: #718096;
+    }
+
+    .bankrupted-badge {
+      background: #e53e3e;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+
+    /* 快速操作 */
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* 遊戲資訊 */
+    .game-info {
+      text-align: center;
+      color: #718096;
+      font-size: 0.9em;
+      padding: 12px;
+    }
+
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: -300px;
+      background: #2d3748;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: right 0.3s ease;
+      z-index: 10000;
+      max-width: 300px;
+    }
+
+    .toast.show {
+      right: 20px;
+    }
+
+    /* Modal 彈窗 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      max-width: 600px;
+      max-height: 80vh;
+      width: 90%;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      animation: slideUp 0.3s ease;
+    }
+
+    .modal-large {
+      max-width: 800px;
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #2d3748;
+      font-size: 1.5em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #718096;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: #f7fafc;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: calc(80vh - 80px);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #a0aec0;
+      padding: 40px;
+      font-style: italic;
+    }
+
+    /* 地產卡片 */
+    .property-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .property-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .property-header {
+      padding: 16px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .property-body {
+      padding: 16px;
+      background: white;
+    }
+
+    .property-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .property-stat:last-child {
+      border-bottom: none;
+    }
+
+    /* 股票相關 */
+    .stock-balance {
+      background: #edf2f7;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1em;
+    }
+
+    .stock-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stock-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stock-info h3 {
+      margin: 0 0 4px 0;
+      color: #2d3748;
+      font-size: 1.2em;
+    }
+
+    .stock-symbol {
+      color: #718096;
+      font-size: 0.9em;
+    }
+
+    .stock-price {
+      text-align: right;
+    }
+
+    .price-main {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #2d3748;
+    }
+
+    .price-change {
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+
+    .stock-owned {
+      font-size: 0.95em;
+      color: #718096;
+    }
+
+    .stock-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      grid-column: 1 / -1;
+    }
+
+    .stock-qty {
+      width: 80px;
+      padding: 8px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+
+    /* 遊戲結束畫面 */
+    .game-over {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .game-over h1 {
+      color: #667eea;
+      font-size: 2.5em;
+      margin-bottom: 30px;
+    }
+
+    .winner-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      margin: 30px 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .winner-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .winner-card h2 {
+      color: #2d3748;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .final-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* 滾動條美化 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a0aec0;
     }
   </style>
 </head>
 <body>
   <div id="app">
+    <!-- 設置畫面 -->
     <div id="setup-screen">
       <h1>🎲 大富翁</h1>
       <div class="subtitle">準備好成為房地產大亨了嗎？</div>
@@ -160,8 +779,14 @@
       <button class="start-button" id="start-game">開始遊戲</button>
     </div>
 
+    <!-- 遊戲畫面 -->
     <div id="game-container">
-      <canvas id="game-canvas"></canvas>
+      <div id="board-container">
+        <canvas id="game-canvas"></canvas>
+      </div>
+      <div id="right-panel">
+        <!-- 動態內容由 UIManager 生成 -->
+      </div>
     </div>
   </div>
 
