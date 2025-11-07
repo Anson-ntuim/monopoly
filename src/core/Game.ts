@@ -56,7 +56,24 @@ export class Game {
   }
 
   private initializeSpaces(): Space[] {
-    return BOARD_SPACES as Space[]
+    return BOARD_SPACES.map(space => {
+      const baseSpace = { ...space } as any
+
+      // 為地產類格子初始化必要的屬性
+      if (space.type === SpaceType.PROPERTY) {
+        baseSpace.owner = null
+        baseSpace.houses = 0
+        baseSpace.mortgaged = false
+      } else if (space.type === SpaceType.STATION) {
+        baseSpace.owner = null
+        baseSpace.mortgaged = false
+      } else if (space.type === SpaceType.UTILITY) {
+        baseSpace.owner = null
+        baseSpace.mortgaged = false
+      }
+
+      return baseSpace as Space
+    })
   }
 
   getCurrentPlayer(): Player {
@@ -171,13 +188,25 @@ export class Game {
   buyProperty(player: Player, spaceId: number): boolean {
     const space = this.state.spaces[spaceId] as any
 
+    console.log('[Game] buyProperty 被調用:', {
+      playerId: player.id,
+      playerName: player.name,
+      spaceId: spaceId,
+      spaceName: space.name,
+      spaceOwner: space.owner,
+      spacePrice: space.price,
+      playerMoney: player.money
+    })
+
     // 檢查地產是否已經有主人（null 和 undefined 都表示無主）
     if (space.owner !== null && space.owner !== undefined) {
+      console.log('[Game] 購買失敗: 已經有主人')
       this.log(`${space.name} 已經有主人了`)
       return false
     }
 
     if (player.money < space.price) {
+      console.log('[Game] 購買失敗: 金錢不足')
       this.log(`${player.name} 沒有足夠的錢購買 ${space.name}`)
       return false
     }
@@ -186,6 +215,7 @@ export class Game {
     space.owner = player.id
     player.properties.push(spaceId)
 
+    console.log('[Game] 購買成功! 新 owner:', space.owner)
     this.log(`${player.name} 購買了 ${space.name}，花費 $${space.price}`)
     this.notifyStateChange()
     return true

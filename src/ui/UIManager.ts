@@ -45,6 +45,7 @@ export class UIManager {
     if (this.game.state.dice[0] === 0) {
       this.diceRolling = false
     }
+    console.log('[UIManager] render() 被調用，當前玩家:', this.game.getCurrentPlayer().name, 'dice:', this.game.state.dice)
     this.renderer.render(this.game.state)
     this.updateRightPanel()
   }
@@ -367,9 +368,19 @@ export class UIManager {
   private getSpaceActionButtons(player: Player, space: any): string {
     let buttons = '<div class="action-buttons-container">'
 
+    console.log('[UIManager] getSpaceActionButtons:', {
+      spaceId: space.id,
+      spaceName: space.name,
+      spaceType: space.type,
+      owner: space.owner,
+      playerId: player.id,
+      hasOwner: space.owner !== null && space.owner !== undefined
+    })
+
     if (space.type === SpaceType.PROPERTY || space.type === SpaceType.STATION || space.type === SpaceType.UTILITY) {
-      if (space.owner === null) {
+      if (space.owner === null || space.owner === undefined) {
         // 無主地產 - 可以購買
+        console.log('[UIManager] 顯示購買按鈕')
         buttons += `<button class="btn btn-success btn-large" data-action="buy" data-space="${space.id}">💰 購買 ($${space.price})</button>`
       } else if (space.owner === player.id) {
         // 自己的地產
@@ -412,18 +423,29 @@ export class UIManager {
 
     // 購買/升級按鈕
     const actionButtons = document.querySelectorAll('[data-action]')
+    console.log('[UIManager] 找到操作按鈕數量:', actionButtons.length)
     actionButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
         const target = e.target as HTMLElement
         const action = target.getAttribute('data-action')
         const spaceId = parseInt(target.getAttribute('data-space') || '0')
 
+        console.log('[UIManager] 按鈕被點擊:', { action, spaceId })
+
         if (action === 'buy') {
-          this.game.buyProperty(this.game.getCurrentPlayer(), spaceId)
-          this.showToast(`成功購買 ${this.game.state.spaces[spaceId].name}！`)
+          const success = this.game.buyProperty(this.game.getCurrentPlayer(), spaceId)
+          if (success) {
+            this.showToast(`成功購買 ${this.game.state.spaces[spaceId].name}！`)
+          } else {
+            this.showToast(`無法購買 ${this.game.state.spaces[spaceId].name}`)
+          }
         } else if (action === 'upgrade') {
-          this.game.upgradeProperty(this.game.getCurrentPlayer(), spaceId)
-          this.showToast(`成功升級 ${this.game.state.spaces[spaceId].name}！`)
+          const success = this.game.upgradeProperty(this.game.getCurrentPlayer(), spaceId)
+          if (success) {
+            this.showToast(`成功升級 ${this.game.state.spaces[spaceId].name}！`)
+          } else {
+            this.showToast(`無法升級 ${this.game.state.spaces[spaceId].name}`)
+          }
         }
       })
     })
@@ -514,10 +536,12 @@ export class UIManager {
 
         await new Promise(resolve => setTimeout(resolve, 500))
         this.game.movePlayer(player, dice[0] + dice[1])
+        console.log('[UIManager] 玩家移動後位置:', player.position, '格子:', this.game.state.spaces[player.position].name)
         await this.game.handleSpace(player, this.game.state.spaces[player.position])
       }
 
       this.diceRolling = false
+      console.log('[UIManager] 骰子動畫結束，即將 render，dice:', this.game.state.dice)
       this.render()
     }, 1000)
   }
