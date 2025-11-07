@@ -1,4 +1,4 @@
-// 棋盘数据定义
+// 棋盤資料定義
 import { Space, SpaceType, PropertyColor } from '../types'
 
 export const BOARD_SPACES: Partial<Space>[] = [

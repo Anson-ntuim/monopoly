@@ -1,11 +1,11 @@
-// 主入口文件
+// 主入口檔案
 import { Game } from './core/Game'
 import { UIManager } from './ui/UIManager'
 
 let game: Game | null = null
 let uiManager: UIManager | null = null
 
-// 初始化玩家设置界面
+// 初始化玩家設置介面
 function initPlayerSetup() {
   const playerCountSelect = document.getElementById('player-count') as HTMLSelectElement
   const playerSetup = document.getElementById('player-setup')!
@@ -32,7 +32,7 @@ function initPlayerSetup() {
   updatePlayerInputs()
 }
 
-// 开始游戏
+// 開始遊戲
 function startGame() {
   const playerCountSelect = document.getElementById('player-count') as HTMLSelectElement
   const count = parseInt(playerCountSelect.value)
@@ -44,14 +44,14 @@ function startGame() {
     playerNames.push(name)
   }
 
-  // 隐藏设置界面
+  // 隱藏設置介面
   const setupScreen = document.getElementById('setup-screen')!
   const gameContainer = document.getElementById('game-container')!
 
   setupScreen.style.display = 'none'
   gameContainer.style.display = 'block'
 
-  // 创建游戏
+  // 創建遊戲
   const canvas = document.getElementById('game-canvas') as HTMLCanvasElement
   game = new Game(playerNames)
   uiManager = new UIManager(game, canvas)
@@ -60,7 +60,7 @@ function startGame() {
   console.log('玩家:', playerNames.join(', '))
 }
 
-// 页面加载完成后初始化
+// 頁面載入完成後初始化
 document.addEventListener('DOMContentLoaded', () => {
   initPlayerSetup()
 
@@ -77,6 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('  ✅ 簡約卡通風格UI')
 })
 
-// 导出供调试使用
+// 匯出供調試使用
 ;(window as any).game = () => game
 ;(window as any).state = () => game?.state

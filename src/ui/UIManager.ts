@@ -1,4 +1,4 @@
-// UI管理器 - 处理所有UI交互
+// UI管理器 - 處理所有UI互動
 import { Game } from '../core/Game'
 import { GameRenderer } from '../renderer/GameRenderer'
 import { GameState, Player, Property, SpaceType, Station, Utility } from '../types'
@@ -22,7 +22,7 @@ export class UIManager {
     this.createUIElements()
     this.setupEventListeners()
 
-    // 监听游戏状态变化
+    // 監聽遊戲狀態變化
     this.game.onStateChange = (state: GameState) => {
       this.render()
     }
@@ -33,7 +33,7 @@ export class UIManager {
   private createUIElements() {
     const gameContainer = document.getElementById('game-container')!
 
-    // 创建UI容器
+    // 創建UI容器
     const uiContainer = document.createElement('div')
     uiContainer.style.cssText = `
       position: absolute;
@@ -45,7 +45,7 @@ export class UIManager {
     `
     gameContainer.appendChild(uiContainer)
 
-    // 动作面板
+    // 動作面板
     this.actionPanel = document.createElement('div')
     this.actionPanel.style.cssText = `
       position: absolute;
@@ -63,7 +63,7 @@ export class UIManager {
     `
     uiContainer.appendChild(this.actionPanel)
 
-    // 消息框
+    // 訊息框
     this.messageBox = document.createElement('div')
     this.messageBox.style.cssText = `
       position: absolute;
@@ -80,7 +80,7 @@ export class UIManager {
     `
     uiContainer.appendChild(this.messageBox)
 
-    // 地产面板（隐藏）
+    // 地產面板（隱藏）
     this.propertyPanel = document.createElement('div')
     this.propertyPanel.style.cssText = `
       position: absolute;
@@ -98,7 +98,7 @@ export class UIManager {
     `
     uiContainer.appendChild(this.propertyPanel)
 
-    // 股市面板（隐藏）
+    // 股市面板（隱藏）
     this.stockPanel = document.createElement('div')
     this.stockPanel.style.cssText = `
       position: absolute;
@@ -120,7 +120,7 @@ export class UIManager {
   }
 
   private setupEventListeners() {
-    // 这里不需要额外的监听器，因为按钮会在渲染时动态创建
+    // 這裡不需要額外的監聽器，因為按鈕會在渲染時動態創建
   }
 
   render() {
@@ -159,7 +159,7 @@ export class UIManager {
       const rollBtn = this.createButton('🎲 投骰子', () => this.rollDice())
       this.actionPanel.appendChild(rollBtn)
     } else {
-      // 当前位置行动按钮
+      // 當前位置行動按鈕
       this.createActionButtons(player, space)
     }
 
@@ -180,7 +180,7 @@ export class UIManager {
   private createActionButtons(player: Player, space: any) {
     if (space.type === SpaceType.PROPERTY || space.type === SpaceType.STATION || space.type === SpaceType.UTILITY) {
       if (space.owner === null) {
-        // 可以购买
+        // 可以購買
         const buyBtn = this.createButton(`💰 購買 ($${space.price})`, () => {
           if (this.game.buyProperty(player, space.id)) {
             this.showMessage(`成功購買 ${space.name}！`)
@@ -189,7 +189,7 @@ export class UIManager {
         buyBtn.style.background = '#4ECDC4'
         this.actionPanel.appendChild(buyBtn)
       } else if (space.owner === player.id && space.type === SpaceType.PROPERTY) {
-        // 自己的地产，可以升级
+        // 自己的地產，可以升級
         const prop = space as Property
         if (prop.houses < 5 && this.game.hasMonopoly(player, prop.color)) {
           const upgradeBtn = this.createButton(`🏗️ 升級 ($${prop.houseCost})`, () => {
@@ -237,7 +237,7 @@ export class UIManager {
     const player = this.game.getCurrentPlayer()
 
     if (player.inJail) {
-      // 在监狱中
+      // 在監獄中
       const dice = this.game.rollDice()
       if (dice[0] === dice[1]) {
         player.inJail = false
@@ -410,7 +410,7 @@ export class UIManager {
 
     this.stockPanel.style.display = 'block'
 
-    // 设置全局函数供按钮调用
+    // 設置全域函數供按鈕調用
     (window as any).buyStock = (symbol: string) => {
       const qty = parseInt((document.getElementById(`qty-${symbol}`) as HTMLInputElement).value)
       if (this.game.stockMarket.buyStock(player, symbol, qty)) {

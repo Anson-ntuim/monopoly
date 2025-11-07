@@ -1,4 +1,4 @@
-// 游戏核心类型定义
+// 遊戲核心類型定義
 
 export enum SpaceType {
   PROPERTY = 'property',

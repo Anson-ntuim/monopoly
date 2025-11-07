@@ -1,4 +1,4 @@
-// 游戏主控制器
+// 遊戲主控制器
 import { GameState, Player, Space, Property, Station, Utility, Stock, SpaceType } from '../types'
 import { BOARD_SPACES, INITIAL_STOCKS } from '../data/boardData'
 import { StockMarket } from './StockMarket'
@@ -27,7 +27,7 @@ export class Game {
       bankrupted: false
     }))
 
-    // 初始化棋盘空间
+    // 初始化棋盤空間
     const spaces = this.initializeSpaces()
 
     // 初始化股票
@@ -72,7 +72,7 @@ export class Game {
     const oldPosition = player.position
     player.position = (player.position + steps) % 40
 
-    // 经过起点获得奖励
+    // 經過起點獲得獎勵
     if (player.position < oldPosition) {
       player.money += 2000
       this.log(`${player.name} 經過起點，獲得 $2000`)
@@ -101,7 +101,7 @@ export class Game {
         this.sendToJail(player)
         break
       case SpaceType.STOCK_MARKET:
-        // 股市交易界面将由UI处理
+        // 股市交易介面將由UI處理
         break
     }
   }
@@ -110,7 +110,7 @@ export class Game {
     const prop = property as any
 
     if (prop.owner === null) {
-      // 无主地产，可以购买
+      // 無主地產，可以購買
       return  // UI will handle purchase
     } else if (prop.owner !== player.id && !prop.mortgaged) {
       // 支付租金
@@ -194,7 +194,7 @@ export class Game {
       return false
     }
 
-    // 检查是否拥有整组地产
+    // 檢查是否擁有整組地產
     if (!this.hasMonopoly(player, property.color)) {
       this.log(`必須擁有整組相同顏色的地產才能升級`)
       return false
@@ -231,7 +231,7 @@ export class Game {
   }
 
   private sendToJail(player: Player) {
-    player.position = 10  // 监狱位置
+    player.position = 10  // 監獄位置
     player.inJail = true
     player.jailTurns = 0
     this.log(`${player.name} 被送進監獄`)
@@ -242,12 +242,12 @@ export class Game {
     // 更新股市
     this.stockMarket.updatePrices()
 
-    // 下一个玩家
+    // 下一個玩家
     do {
       this.state.currentPlayerIndex = (this.state.currentPlayerIndex + 1) % this.state.players.length
     } while (this.getCurrentPlayer().bankrupted && !this.state.gameOver)
 
-    // 检查游戏是否结束
+    // 檢查遊戲是否結束
     const activePlayers = this.state.players.filter(p => !p.bankrupted)
     if (activePlayers.length === 1) {
       this.state.gameOver = true

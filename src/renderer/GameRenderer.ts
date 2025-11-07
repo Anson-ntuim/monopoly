@@ -1,4 +1,4 @@
-// 游戏渲染器 - 卡通风格
+// 遊戲渲染器 - 卡通風格
 import { GameState, Player, Space, Property, Station, Utility, SpaceType } from '../types'
 
 export class GameRenderer {
@@ -30,13 +30,13 @@ export class GameRenderer {
     this.ctx.save()
     this.ctx.translate(offsetX, offsetY)
 
-    // 绘制棋盘
+    // 繪製棋盤
     this.drawBoard(state)
 
-    // 绘制玩家
+    // 繪製玩家
     this.drawPlayers(state)
 
-    // 绘制中央信息面板
+    // 繪製中央資訊面板
     this.drawCenterPanel(state)
 
     this.ctx.restore()
@@ -52,21 +52,21 @@ export class GameRenderer {
       this.drawSpace(spaces[i], x, y, state)
     }
 
-    // 左侧列 (11-19)
+    // 左側列 (11-19)
     for (let i = 11; i <= 19; i++) {
       const x = 0
       const y = this.boardSize - this.spaceSize - ((i - 10) * this.spaceSize)
       this.drawSpace(spaces[i], x, y, state)
     }
 
-    // 顶部行 (20-30)
+    // 頂部行 (20-30)
     for (let i = 20; i <= 30; i++) {
       const x = (i - 20) * this.spaceSize
       const y = 0
       this.drawSpace(spaces[i], x, y, state)
     }
 
-    // 右侧列 (31-39)
+    // 右側列 (31-39)
     for (let i = 31; i <= 39; i++) {
       const x = this.boardSize - this.spaceSize
       const y = (i - 30) * this.spaceSize
@@ -81,19 +81,19 @@ export class GameRenderer {
     ctx.fillStyle = '#FFFFFF'
     ctx.fillRect(x, y, this.spaceSize, this.spaceSize)
 
-    // 边框
+    // 邊框
     ctx.strokeStyle = '#333'
     ctx.lineWidth = 2
     ctx.strokeRect(x, y, this.spaceSize, this.spaceSize)
 
-    // 颜色条（地产类）
+    // 顏色條（地產類）
     if (space.type === SpaceType.PROPERTY) {
       const prop = space as Property
       ctx.fillStyle = prop.color
       ctx.fillRect(x, y, this.spaceSize, 15)
     }
 
-    // 所有权标记
+    // 所有權標記
     const owner = this.getSpaceOwner(space, state)
     if (owner !== null) {
       ctx.fillStyle = state.players[owner].color
@@ -102,7 +102,7 @@ export class GameRenderer {
       ctx.fill()
     }
 
-    // 房屋/酒店标记
+    // 房屋/酒店標記
     if (space.type === SpaceType.PROPERTY) {
       const prop = space as Property
       if (prop.houses > 0) {
@@ -110,7 +110,7 @@ export class GameRenderer {
       }
     }
 
-    // 名称
+    // 名稱
     ctx.fillStyle = '#333'
     ctx.font = 'bold 10px Arial'
     ctx.textAlign = 'center'
@@ -119,7 +119,7 @@ export class GameRenderer {
     const name = space.name.length > 6 ? space.name.substring(0, 5) + '...' : space.name
     ctx.save()
 
-    // 旋转文字以适应空间位置
+    // 旋轉文字以適應空間位置
     if (space.id >= 1 && space.id <= 9) {
       // 底部
       ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 25)
@@ -143,7 +143,7 @@ export class GameRenderer {
 
     ctx.restore()
 
-    // 特殊图标
+    // 特殊圖標
     this.drawSpaceIcon(space, x, y)
   }
 
@@ -228,7 +228,7 @@ export class GameRenderer {
       const playerX = pos.x + 20 + (offsetIndex * 15)
       const playerY = pos.y + 20
 
-      // 玩家棋子（卡通风格）
+      // 玩家棋子（卡通風格）
       const ctx = this.ctx
       ctx.fillStyle = player.color
       ctx.beginPath()
@@ -239,14 +239,14 @@ export class GameRenderer {
       ctx.lineWidth = 2
       ctx.stroke()
 
-      // 玩家编号
+      // 玩家編號
       ctx.fillStyle = '#FFF'
       ctx.font = 'bold 12px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText((player.id + 1).toString(), playerX, playerY)
 
-      // 监狱标记
+      // 監獄標記
       if (player.inJail) {
         ctx.fillStyle = '#000'
         ctx.font = '16px Arial'
@@ -298,13 +298,13 @@ export class GameRenderer {
     ctx.lineWidth = 4
     ctx.strokeRect(centerX - panelWidth / 2, centerY - panelHeight / 2, panelWidth, panelHeight)
 
-    // 标题
+    // 標題
     ctx.fillStyle = '#667eea'
     ctx.font = 'bold 24px Arial'
     ctx.textAlign = 'center'
     ctx.fillText('🎲 大富翁', centerX, centerY - 220)
 
-    // 当前玩家信息
+    // 當前玩家資訊
     const currentPlayer = state.players[state.currentPlayerIndex]
     ctx.font = 'bold 18px Arial'
     ctx.fillStyle = currentPlayer.color
@@ -323,7 +323,7 @@ export class GameRenderer {
       ctx.textAlign = 'left'
       ctx.fillText(`${player.name}: $${player.money}`, centerX - 190, yOffset + 5)
 
-      // 地产数量
+      // 地產數量
       ctx.font = '12px Arial'
       ctx.fillStyle = '#666'
       ctx.fillText(`地產: ${player.properties.length} | 位置: ${state.spaces[player.position].name}`, centerX - 190, yOffset + 22)
@@ -331,7 +331,7 @@ export class GameRenderer {
       yOffset += 45
     })
 
-    // 骰子显示
+    // 骰子顯示
     if (state.dice[0] > 0) {
       const diceY = centerY + 80
       ctx.fillStyle = '#FFF'
@@ -353,20 +353,20 @@ export class GameRenderer {
       ctx.fillStyle = '#000'
       ctx.fillText(state.dice[1].toString(), centerX + 40, diceY + 25)
 
-      // 总点数
+      // 總點數
       ctx.fillStyle = '#667eea'
       ctx.font = 'bold 16px Arial'
       ctx.fillText(`總點數: ${state.dice[0] + state.dice[1]}`, centerX, diceY + 60)
     }
 
-    // 回合数
+    // 回合數
     ctx.fillStyle = '#999'
     ctx.font = '12px Arial'
     ctx.textAlign = 'center'
     ctx.fillText(`回合: ${state.turn}`, centerX, centerY + 220)
   }
 
-  // 绘制股市面板
+  // 繪製股市面板
   drawStockPanel(state: GameState, x: number, y: number, width: number, height: number) {
     const ctx = this.ctx
 
@@ -377,7 +377,7 @@ export class GameRenderer {
     ctx.lineWidth = 3
     ctx.strokeRect(x, y, width, height)
 
-    // 标题
+    // 標題
     ctx.fillStyle = '#667eea'
     ctx.font = 'bold 20px Arial'
     ctx.textAlign = 'center'
@@ -394,7 +394,7 @@ export class GameRenderer {
       ctx.font = '14px Arial'
       ctx.fillText(`價格: $${stock.price}`, x + 20, yOffset + 20)
 
-      // 涨跌
+      // 漲跌
       const changeColor = stock.change >= 0 ? '#00AA00' : '#FF0000'
       const changeText = stock.change >= 0 ? `+${stock.change.toFixed(2)}%` : `${stock.change.toFixed(2)}%`
       ctx.fillStyle = changeColor

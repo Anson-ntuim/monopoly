@@ -1,4 +1,4 @@
-// 股市系统
+// 股市系統
 import { Stock, Player } from '../types'
 import { Game } from './Game'
 
@@ -11,7 +11,7 @@ export class StockMarket {
 
   updatePrices() {
     this.game.state.stocks.forEach(stock => {
-      // 随机波动 -10% 到 +10%
+      // 隨機波動 -10% 到 +10%
       const changePercent = (Math.random() - 0.5) * 20
       const oldPrice = stock.price
       const newPrice = Math.max(10, Math.round(stock.price * (1 + changePercent / 100)))
@@ -20,7 +20,7 @@ export class StockMarket {
       stock.change = ((newPrice - oldPrice) / oldPrice) * 100
       stock.history.push(newPrice)
 
-      // 只保留最近20个价格历史
+      // 只保留最近20個價格歷史
       if (stock.history.length > 20) {
         stock.history.shift()
       }
@@ -81,7 +81,7 @@ export class StockMarket {
   getTotalAssets(player: Player): number {
     let total = player.money
 
-    // 地产价值
+    // 地產價值
     player.properties.forEach(propId => {
       const space = this.game.state.spaces[propId] as any
       if (space.price) {
@@ -92,7 +92,7 @@ export class StockMarket {
       }
     })
 
-    // 股票价值
+    // 股票價值
     total += this.getPortfolioValue(player)
 
     return total
