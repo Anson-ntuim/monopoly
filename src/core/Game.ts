@@ -10,6 +10,7 @@ export class Game {
   chanceCards: CardDeck
   communityCards: CardDeck
   onStateChange: ((state: GameState) => void) | null = null
+  onRentPayment: ((amount: number, ownerName: string, propertyName: string, payer: Player, owner: Player) => Promise<void>) | null = null
 
   constructor(playerNames: string[]) {
     // 初始化玩家
@@ -118,6 +119,11 @@ export class Game {
       const owner = this.state.players[prop.owner]
 
       if (player.money >= rent) {
+        // 觸發租金通知UI
+        if (this.onRentPayment) {
+          await this.onRentPayment(rent, owner.name, property.name, player, owner)
+        }
+
         player.money -= rent
         owner.money += rent
         this.log(`${player.name} 支付 $${rent} 租金給 ${owner.name}`)

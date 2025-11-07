@@ -23,6 +23,11 @@ export class UIManager {
       this.render()
     }
 
+    // 監聽租金支付事件
+    this.game.onRentPayment = async (amount: number, ownerName: string, propertyName: string, payer: Player, owner: Player) => {
+      await this.showRentNotification(amount, ownerName, propertyName, payer, owner)
+    }
+
     this.render()
   }
 
@@ -287,6 +292,66 @@ export class UIManager {
       toast.classList.remove('show')
       setTimeout(() => document.body.removeChild(toast), 300)
     }, 3000)
+  }
+
+  private showMoneyAnimation(amount: number, isGain: boolean = false, targetElement?: HTMLElement) {
+    const money = document.createElement('div')
+    money.className = `money-animation ${isGain ? 'gain' : ''}`
+    money.textContent = `${isGain ? '+' : '-'}$${amount}`
+
+    // 如果提供了目標元素，從該元素位置顯示動畫
+    if (targetElement) {
+      const rect = targetElement.getBoundingClientRect()
+      money.style.left = rect.left + rect.width / 2 + 'px'
+      money.style.top = rect.top + rect.height / 2 + 'px'
+    } else {
+      // 否則在右側面板中間顯示
+      const rightPanel = document.getElementById('right-panel')!
+      const rect = rightPanel.getBoundingClientRect()
+      money.style.left = rect.left + rect.width / 2 + 'px'
+      money.style.top = rect.top + rect.height / 2 + 'px'
+    }
+
+    document.body.appendChild(money)
+
+    setTimeout(() => {
+      if (money.parentNode) {
+        document.body.removeChild(money)
+      }
+    }, 2000)
+  }
+
+  private showRentNotification(amount: number, ownerName: string, propertyName: string, payer: Player, owner: Player): Promise<void> {
+    return new Promise((resolve) => {
+      const notification = document.createElement('div')
+      notification.className = 'rent-notification'
+      notification.innerHTML = `
+        <h3>💰 需支付租金</h3>
+        <div style="font-size: 1.1em; color: #718096; margin-bottom: 10px;">
+          ${propertyName}
+        </div>
+        <div class="amount">$${amount}</div>
+        <div class="owner-name">支付給 ${ownerName}</div>
+        <button class="btn btn-primary" style="margin-top: 20px;" id="pay-rent-btn">
+          確認支付
+        </button>
+      `
+      document.body.appendChild(notification)
+
+      document.getElementById('pay-rent-btn')!.onclick = () => {
+        document.body.removeChild(notification)
+
+        // 顯示支付者的金錢減少動畫
+        this.showMoneyAnimation(amount, false)
+
+        // 稍微延遲後顯示接收者的金錢增加動畫
+        setTimeout(() => {
+          this.showMoneyAnimation(amount, true)
+        }, 200)
+
+        resolve()
+      }
+    })
   }
 
   private showPropertyManagement() {

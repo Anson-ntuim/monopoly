@@ -68,7 +68,7 @@ export class GameRenderer {
 
     // 底部行 (0-10)
     for (let i = 0; i <= 10; i++) {
-      const x = this.boardSize - (i * this.spaceSize)
+      const x = this.boardSize - ((i + 1) * this.spaceSize)
       const y = this.boardSize - this.spaceSize
       this.drawSpace(spaces[i], x, y, state)
     }
@@ -293,23 +293,23 @@ export class GameRenderer {
     if (spaceId >= 0 && spaceId <= 10) {
       // 底部
       return {
-        x: this.boardSize - (spaceId * this.spaceSize),
+        x: this.boardSize - ((spaceId + 1) * this.spaceSize),
         y: this.boardSize - this.spaceSize
       }
     } else if (spaceId >= 11 && spaceId <= 19) {
-      // 左侧
+      // 左側
       return {
         x: 0,
         y: this.boardSize - this.spaceSize - ((spaceId - 10) * this.spaceSize)
       }
     } else if (spaceId >= 20 && spaceId <= 30) {
-      // 顶部
+      // 頂部
       return {
         x: (spaceId - 20) * this.spaceSize,
         y: 0
       }
     } else {
-      // 右侧
+      // 右側
       return {
         x: this.boardSize - this.spaceSize,
         y: (spaceId - 30) * this.spaceSize
