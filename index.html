@@ -366,6 +366,8 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      max-height: 500px;
+      overflow-y: auto;
     }
 
     .no-action {
@@ -373,6 +375,131 @@
       text-align: center;
       padding: 20px;
       font-style: italic;
+    }
+
+    /* 格子資訊卡片 */
+    .space-info-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-header {
+      padding: 16px;
+      color: white;
+      text-align: center;
+    }
+
+    .info-header h3 {
+      margin: 0;
+      font-size: 1.2em;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-body {
+      padding: 16px;
+      background: #f7fafc;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-row span {
+      color: #718096;
+      font-size: 0.95em;
+    }
+
+    .info-row strong {
+      color: #2d3748;
+      font-size: 1em;
+    }
+
+    .info-row.owner-info {
+      background: #edf2f7;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .info-section {
+      margin: 12px 0;
+    }
+
+    .info-subtitle {
+      font-weight: bold;
+      color: #4a5568;
+      font-size: 0.9em;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #cbd5e0;
+    }
+
+    .rent-table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .rent-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid #f7fafc;
+    }
+
+    .rent-row:last-child {
+      border-bottom: none;
+    }
+
+    .rent-row span:first-child {
+      color: #718096;
+      font-size: 0.9em;
+    }
+
+    .rent-row span:last-child {
+      color: #2d3748;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+
+    .info-message {
+      text-align: center;
+      color: #4a5568;
+      padding: 16px;
+      line-height: 1.6;
+      font-size: 0.95em;
+    }
+
+    .info-message strong {
+      color: #667eea;
+      font-size: 1.1em;
+    }
+
+    /* 操作按鈕容器 */
+    .action-buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-hint {
+      text-align: center;
+      color: #718096;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 8px;
+      font-size: 0.9em;
+      border: 2px dashed #cbd5e0;
     }
 
     /* 玩家列表 */
@@ -855,6 +982,95 @@
       }
       50% {
         transform: scale(1.1);
+      }
+    }
+
+    /* 卡片彈窗 */
+    .card-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .card-modal {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      min-width: 350px;
+      max-width: 500px;
+      animation: cardFlip 0.6s ease;
+      position: relative;
+    }
+
+    .card-modal.chance-card {
+      border: 4px solid #ed8936;
+    }
+
+    .card-modal.community-card {
+      border: 4px solid #38b2ac;
+    }
+
+    .card-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+      animation: bounce 0.6s ease;
+    }
+
+    .card-modal h2 {
+      color: #2d3748;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .card-modal.chance-card h2 {
+      color: #ed8936;
+    }
+
+    .card-modal.community-card h2 {
+      color: #38b2ac;
+    }
+
+    .card-description {
+      font-size: 1.2em;
+      color: #4a5568;
+      line-height: 1.6;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 12px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes cardFlip {
+      0% {
+        transform: perspective(400px) rotateY(90deg);
+        opacity: 0;
+      }
+      100% {
+        transform: perspective(400px) rotateY(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
       }
     }
 

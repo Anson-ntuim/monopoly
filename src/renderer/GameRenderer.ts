@@ -131,19 +131,32 @@ export class GameRenderer {
       }
     }
 
-    // 名稱
+    // 名稱和價格
     ctx.fillStyle = '#333'
     ctx.font = 'bold 9px Arial'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
     const name = space.name.length > 6 ? space.name.substring(0, 5) + '...' : space.name
+
+    // 獲取價格（如果有）
+    let price = ''
+    if (space.type === SpaceType.PROPERTY || space.type === SpaceType.STATION || space.type === SpaceType.UTILITY) {
+      const priceValue = (space as any).price
+      price = priceValue ? `$${priceValue}` : ''
+    }
+
     ctx.save()
 
     // 旋轉文字以適應空間位置
     if (space.id >= 1 && space.id <= 9) {
       // 底部 - 正常顯示
-      ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 20)
+      ctx.fillText(name, x + this.spaceSize / 2, y + this.spaceSize - 25)
+      if (price) {
+        ctx.font = 'bold 7px Arial'
+        ctx.fillStyle = '#0066cc'
+        ctx.fillText(price, x + this.spaceSize / 2, y + this.spaceSize - 12)
+      }
     } else if (space.id === 10) {
       // 右下角 - 監獄
       ctx.font = 'bold 8px Arial'
@@ -152,14 +165,24 @@ export class GameRenderer {
       // 左側 - 逆時針旋轉 90 度
       ctx.translate(x + 15, y + this.spaceSize / 2)
       ctx.rotate(-Math.PI / 2)
-      ctx.fillText(name, 0, 0)
+      ctx.fillText(name, 0, 5)
+      if (price) {
+        ctx.font = 'bold 6px Arial'
+        ctx.fillStyle = '#0066cc'
+        ctx.fillText(price, 0, -5)
+      }
     } else if (space.id === 20) {
       // 左上角 - 股市
       ctx.font = 'bold 8px Arial'
       ctx.fillText(name, x + this.spaceSize / 2, y + 15)
     } else if (space.id >= 21 && space.id <= 29) {
       // 頂部 - 正常顯示
-      ctx.fillText(name, x + this.spaceSize / 2, y + 20)
+      ctx.fillText(name, x + this.spaceSize / 2, y + 25)
+      if (price) {
+        ctx.font = 'bold 7px Arial'
+        ctx.fillStyle = '#0066cc'
+        ctx.fillText(price, x + this.spaceSize / 2, y + 35)
+      }
     } else if (space.id === 30) {
       // 右上角 - 入獄
       ctx.font = 'bold 8px Arial'
@@ -168,7 +191,12 @@ export class GameRenderer {
       // 右側 - 順時針旋轉 90 度
       ctx.translate(x + this.spaceSize - 15, y + this.spaceSize / 2)
       ctx.rotate(Math.PI / 2)
-      ctx.fillText(name, 0, 0)
+      ctx.fillText(name, 0, 5)
+      if (price) {
+        ctx.font = 'bold 6px Arial'
+        ctx.fillStyle = '#0066cc'
+        ctx.fillText(price, 0, -5)
+      }
     } else if (space.id === 0) {
       // 右下角 - 起點
       ctx.font = 'bold 10px Arial'

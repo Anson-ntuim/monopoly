@@ -28,6 +28,11 @@ export class UIManager {
       await this.showRentNotification(amount, ownerName, propertyName, payer, owner)
     }
 
+    // 監聽抽卡事件
+    this.game.onCardDrawn = async (cardType: 'chance' | 'community', description: string) => {
+      await this.showCardModal(cardType, description)
+    }
+
     this.render()
   }
 
@@ -132,23 +137,266 @@ export class UIManager {
 
   private getActionButtons(player: Player, space: any): string {
     if (this.game.state.dice[0] === 0) {
-      return ''
+      return '<div class="no-action">請投擲骰子開始回合</div>'
     }
 
-    let buttons = ''
+    let content = ''
+
+    // 顯示格子資訊卡片
+    content += this.getSpaceInfoCard(player, space)
+
+    // 顯示操作按鈕
+    content += this.getSpaceActionButtons(player, space)
+
+    return content
+  }
+
+  private getSpaceInfoCard(player: Player, space: any): string {
+    let infoHTML = '<div class="space-info-card">'
+
+    switch (space.type) {
+      case SpaceType.PROPERTY:
+        const prop = space as Property
+        infoHTML += `
+          <div class="info-header" style="background: ${prop.color};">
+            <h3>${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-row">
+              <span>💰 售價</span>
+              <strong>$${prop.price}</strong>
+            </div>
+            <div class="info-section">
+              <div class="info-subtitle">租金明細</div>
+              <div class="rent-table">
+                <div class="rent-row"><span>空地</span><span>$${prop.rent[0]}</span></div>
+                <div class="rent-row"><span>1棟房</span><span>$${prop.rent[1]}</span></div>
+                <div class="rent-row"><span>2棟房</span><span>$${prop.rent[2]}</span></div>
+                <div class="rent-row"><span>3棟房</span><span>$${prop.rent[3]}</span></div>
+                <div class="rent-row"><span>4棟房</span><span>$${prop.rent[4]}</span></div>
+                <div class="rent-row"><span>飯店</span><span>$${prop.rent[5]}</span></div>
+              </div>
+            </div>
+            <div class="info-row">
+              <span>🏗️ 建造費用</span>
+              <strong>$${prop.houseCost}</strong>
+            </div>
+            ${prop.owner !== null ? `
+              <div class="info-row owner-info">
+                <span>👤 地主</span>
+                <strong style="color: ${this.game.state.players[prop.owner].color};">${this.game.state.players[prop.owner].name}</strong>
+              </div>
+              <div class="info-row">
+                <span>🏠 建築</span>
+                <strong>${prop.houses === 5 ? '🏨 飯店' : prop.houses > 0 ? `🏠 ${prop.houses}棟` : '空地'}</strong>
+              </div>
+            ` : ''}
+          </div>
+        `
+        break
+
+      case SpaceType.STATION:
+        const station = space as Station
+        infoHTML += `
+          <div class="info-header" style="background: #333;">
+            <h3>🚂 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-row">
+              <span>💰 售價</span>
+              <strong>$${station.price}</strong>
+            </div>
+            <div class="info-section">
+              <div class="info-subtitle">租金明細</div>
+              <div class="rent-table">
+                <div class="rent-row"><span>1個車站</span><span>$${station.rent[0]}</span></div>
+                <div class="rent-row"><span>2個車站</span><span>$${station.rent[1]}</span></div>
+                <div class="rent-row"><span>3個車站</span><span>$${station.rent[2]}</span></div>
+                <div class="rent-row"><span>4個車站</span><span>$${station.rent[3]}</span></div>
+              </div>
+            </div>
+            ${station.owner !== null ? `
+              <div class="info-row owner-info">
+                <span>👤 地主</span>
+                <strong style="color: ${this.game.state.players[station.owner].color};">${this.game.state.players[station.owner].name}</strong>
+              </div>
+            ` : ''}
+          </div>
+        `
+        break
+
+      case SpaceType.UTILITY:
+        const utility = space as Utility
+        infoHTML += `
+          <div class="info-header" style="background: #4299e1;">
+            <h3>⚡ ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-row">
+              <span>💰 售價</span>
+              <strong>$${utility.price}</strong>
+            </div>
+            <div class="info-section">
+              <div class="info-subtitle">租金計算</div>
+              <div class="rent-table">
+                <div class="rent-row"><span>1個公用設施</span><span>骰子點數 × 40</span></div>
+                <div class="rent-row"><span>2個公用設施</span><span>骰子點數 × 100</span></div>
+              </div>
+            </div>
+            ${utility.owner !== null ? `
+              <div class="info-row owner-info">
+                <span>👤 地主</span>
+                <strong style="color: ${this.game.state.players[utility.owner].color};">${this.game.state.players[utility.owner].name}</strong>
+              </div>
+            ` : ''}
+          </div>
+        `
+        break
+
+      case SpaceType.START:
+        infoHTML += `
+          <div class="info-header" style="background: #48bb78;">
+            <h3>🏁 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              恭喜！每次經過或停留在起點可獲得 <strong>$2000</strong>
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.JAIL:
+        infoHTML += `
+          <div class="info-header" style="background: #718096;">
+            <h3>🔒 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              您只是來訪問監獄，沒有任何懲罰
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.FREE_PARKING:
+        infoHTML += `
+          <div class="info-header" style="background: #9f7aea;">
+            <h3>🅿️ ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              免費停車，好好休息一下吧！
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.GO_TO_JAIL:
+        infoHTML += `
+          <div class="info-header" style="background: #e53e3e;">
+            <h3>👮 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              直接前往監獄！不能通過起點，不能領取 $2000
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.TAX:
+        const taxAmount = space.id === 4 ? 2000 : 1000
+        infoHTML += `
+          <div class="info-header" style="background: #f56565;">
+            <h3>💸 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-row">
+              <span>繳納稅金</span>
+              <strong>$${taxAmount}</strong>
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.CHANCE:
+        infoHTML += `
+          <div class="info-header" style="background: #ed8936;">
+            <h3>❓ ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              抽取機會卡，可能是好事也可能是壞事...
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.COMMUNITY_CHEST:
+        infoHTML += `
+          <div class="info-header" style="background: #38b2ac;">
+            <h3>📦 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              抽取命運卡，看看會發生什麼吧！
+            </div>
+          </div>
+        `
+        break
+
+      case SpaceType.STOCK_MARKET:
+        infoHTML += `
+          <div class="info-header" style="background: #667eea;">
+            <h3>📈 ${space.name}</h3>
+          </div>
+          <div class="info-body">
+            <div class="info-message">
+              歡迎來到股市交易所！點擊下方按鈕進行交易
+            </div>
+          </div>
+        `
+        break
+    }
+
+    infoHTML += '</div>'
+    return infoHTML
+  }
+
+  private getSpaceActionButtons(player: Player, space: any): string {
+    let buttons = '<div class="action-buttons-container">'
 
     if (space.type === SpaceType.PROPERTY || space.type === SpaceType.STATION || space.type === SpaceType.UTILITY) {
       if (space.owner === null) {
-        buttons += `<button class="btn btn-success" data-action="buy" data-space="${space.id}">💰 購買 ${space.name} ($${space.price})</button>`
-      } else if (space.owner === player.id && space.type === SpaceType.PROPERTY) {
-        const prop = space as Property
-        if (prop.houses < 5 && this.game.hasMonopoly(player, prop.color)) {
-          buttons += `<button class="btn btn-warning" data-action="upgrade" data-space="${space.id}">🏗️ 升級 ${space.name} ($${prop.houseCost})</button>`
+        // 無主地產 - 可以購買
+        buttons += `<button class="btn btn-success btn-large" data-action="buy" data-space="${space.id}">💰 購買 ($${space.price})</button>`
+      } else if (space.owner === player.id) {
+        // 自己的地產
+        if (space.type === SpaceType.PROPERTY) {
+          const prop = space as Property
+          if (prop.houses < 5 && this.game.hasMonopoly(player, prop.color)) {
+            buttons += `<button class="btn btn-warning btn-large" data-action="upgrade" data-space="${space.id}">🏗️ 建造/升級 ($${prop.houseCost})</button>`
+          } else if (!this.game.hasMonopoly(player, prop.color)) {
+            buttons += '<div class="action-hint">💡 需要擁有同色全組地產才能建造</div>'
+          } else if (prop.houses === 5) {
+            buttons += '<div class="action-hint">✅ 已達最高等級（飯店）</div>'
+          }
+        } else {
+          buttons += '<div class="action-hint">✅ 這是你的資產</div>'
         }
+      } else {
+        // 別人的地產 - 已經自動支付租金
+        buttons += '<div class="action-hint">💸 已支付租金給地主</div>'
       }
+    } else if (space.type === SpaceType.STOCK_MARKET) {
+      buttons += `<button class="btn btn-primary btn-large" onclick="document.getElementById('stock-market-btn').click()">📈 開啟股市交易</button>`
+    } else {
+      buttons += '<div class="action-hint">無需額外操作</div>'
     }
 
-    return buttons || '<div class="no-action">沒有可用的操作</div>'
+    buttons += '</div>'
+    return buttons
   }
 
   private bindEvents() {
@@ -349,6 +597,32 @@ export class UIManager {
           this.showMoneyAnimation(amount, true)
         }, 200)
 
+        resolve()
+      }
+    })
+  }
+
+  private showCardModal(cardType: 'chance' | 'community', description: string): Promise<void> {
+    return new Promise((resolve) => {
+      const isChance = cardType === 'chance'
+      const modal = document.createElement('div')
+      modal.className = 'card-modal-overlay'
+      modal.innerHTML = `
+        <div class="card-modal ${isChance ? 'chance-card' : 'community-card'}">
+          <div class="card-icon">${isChance ? '❓' : '📦'}</div>
+          <h2>${isChance ? '機會' : '命運'}</h2>
+          <div class="card-description">
+            ${description}
+          </div>
+          <button class="btn btn-primary btn-large" id="card-ok-btn">
+            確認
+          </button>
+        </div>
+      `
+      document.body.appendChild(modal)
+
+      document.getElementById('card-ok-btn')!.onclick = () => {
+        document.body.removeChild(modal)
         resolve()
       }
     })

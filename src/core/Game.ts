@@ -11,6 +11,7 @@ export class Game {
   communityCards: CardDeck
   onStateChange: ((state: GameState) => void) | null = null
   onRentPayment: ((amount: number, ownerName: string, propertyName: string, payer: Player, owner: Player) => Promise<void>) | null = null
+  onCardDrawn: ((cardType: 'chance' | 'community', description: string) => Promise<void>) | null = null
 
   constructor(playerNames: string[]) {
     // 初始化玩家
@@ -90,10 +91,16 @@ export class Game {
         await this.handlePropertySpace(player, space as Property | Station | Utility)
         break
       case SpaceType.CHANCE:
-        this.chanceCards.draw(player)
+        const chanceCard = this.chanceCards.draw(player)
+        if (this.onCardDrawn) {
+          await this.onCardDrawn('chance', chanceCard.description)
+        }
         break
       case SpaceType.COMMUNITY_CHEST:
-        this.communityCards.draw(player)
+        const communityCard = this.communityCards.draw(player)
+        if (this.onCardDrawn) {
+          await this.onCardDrawn('community', communityCard.description)
+        }
         break
       case SpaceType.TAX:
         this.handleTax(player, space)
